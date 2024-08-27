@@ -1,3 +1,5 @@
+const TAG_INTERNAL_SERVER_ERROR = '[INTERNAL SERVER ERROR]'
+
 class ErrorEntity {
     public error_code: string
     public error_description: string
@@ -10,5 +12,6 @@ class ErrorEntity {
 }
 
 export {
-    ErrorEntity
+    ErrorEntity,
+    TAG_INTERNAL_SERVER_ERROR
 }

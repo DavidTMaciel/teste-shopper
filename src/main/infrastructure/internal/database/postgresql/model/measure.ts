@@ -12,15 +12,15 @@ class MeasureModel {
     public measure_type: string
 
     @Column({ type: 'varchar' })
-    public has_confirmed: string
+    public has_confirmed: boolean
 
     @Column({ type: 'varchar' })
     public image_url: string
 
-    @Column({ type: 'varchar' })
-    public measure_value: string
+    @Column({ type: 'integer' })
+    public measure_value: number
 
-    constructor(measure_uuid: string, measure_datetime: Date, measure_type: string, has_confirmed: string, image_url: string, measure_value: string) {
+    constructor(measure_uuid: string, measure_datetime: Date, measure_type: string, has_confirmed: boolean, image_url: string, measure_value: number) {
         this.measure_uuid = measure_uuid
         this.measure_datetime = measure_datetime
         this.measure_type = measure_type
