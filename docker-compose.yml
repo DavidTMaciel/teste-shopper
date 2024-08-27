@@ -1,0 +1,32 @@
+version: '3'
+services:
+  app:
+    build: .
+    image: node:22.2.0
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "3000:3000"
+    command: npm start
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL:postgres://user:password@db:5432/shopper 
+      - DB_USER_NAME:user
+      - DB_PASSWORD:password
+      - DB_NAME:shopper
+      - GEMINI_API_KEY:AIzaSyD8JFsKZL4lVbrzKs6iR9NiEecvuWMhVK0
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: shopper
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
