@@ -11,7 +11,7 @@ class GeminiService {
         this.fileManager = new GoogleAIFileManager(apiKey);
     }
 
-    public async uploadFile(image: string, displayName: string, mimeType: string): Promise<UploadFileResponse> {
+    public async uploadImage(image: string, displayName: string, mimeType: string): Promise<UploadFileResponse> {
         const uploadResponse = await this.fileManager.uploadFile(image, {
             mimeType,
             displayName,
@@ -19,7 +19,7 @@ class GeminiService {
         return new UploadFileResponse(uploadResponse.file.mimeType, uploadResponse.file.uri)
     }
 
-    public async getMesureFromImage(mimeType: string, fileUri: string, prompt: string): Promise<string> {
+    public async extractMesureFromImage(mimeType: string, fileUri: string, prompt: string): Promise<string> {
         const chatSession = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro", })
         const result = await chatSession.generateContent([
             {

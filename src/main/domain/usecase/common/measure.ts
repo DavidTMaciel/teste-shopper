@@ -1,6 +1,6 @@
 interface UploadImageForMeasureUseCaseCommonInterface{
     generateUUID():string
-    date():Date
+    newDate(): Date
 }
 
 export{

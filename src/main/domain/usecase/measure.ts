@@ -28,8 +28,8 @@ class UploadImageForMeasureUseCase {
                 const upload = await this.repository.uploadImageForMeasure(image, imageID, mimeType!)
 
                 let prompt = 'pegar da imagem a sequencia de numeros que aparece no medidor, e retornar em texto o valor numerico'
-                const measureValue = await this.repository.extractMesureFromImage(upload.mimeType, upload.fileUri, prompt)
-
+                const value = await this.repository.extractMesureFromImage(upload.mimeType, upload.fileUri, prompt)
+                let measureValue = Number(value)
                 const temporaryUrl = this.repository.createTemporaryLinkForImage(req.image)
 
                 const measureID = this.common.generateUUID()
