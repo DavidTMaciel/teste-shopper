@@ -1,10 +1,10 @@
 class UploadImageForMeasureUseCaseRequest {
     public image: string
     public customer_code: string
-    public measure_datetime: Date
+    public measure_datetime: string
     public measure_type: string
 
-    constructor(image: string, customer_code: string, measure_datetime: Date, measure_type: string) {
+    constructor(image: string, customer_code: string, measure_datetime: string, measure_type: string) {
         this.image = image
         this.customer_code = customer_code
         this.measure_datetime = measure_datetime
@@ -24,7 +24,27 @@ class UploadImageForMeasureUseCaseResponse {
     }
 }
 
+class ConfirmMeasureUseCaseRequest {
+    public measure_uuid: string
+    public confirmed_value: number
+
+    constructor(measure_uuid: string, confirmed_value: number) {
+        this.measure_uuid = measure_uuid
+        this.confirmed_value = confirmed_value
+    }
+}
+
+class ConfirmMeasureUseCaseResponse {
+    public success: boolean | null
+
+    constructor(sucess: boolean | null) {
+        this.success = sucess
+    }
+}
+
 export {
     UploadImageForMeasureUseCaseRequest,
-    UploadImageForMeasureUseCaseResponse
+    UploadImageForMeasureUseCaseResponse,
+    ConfirmMeasureUseCaseRequest,
+    ConfirmMeasureUseCaseResponse
 }

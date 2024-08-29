@@ -20,18 +20,25 @@ class GeminiService {
     }
 
     public async extractMesureFromImage(mimeType: string, fileUri: string, prompt: string): Promise<string> {
-        const chatSession = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro", })
-        const result = await chatSession.generateContent([
-            {
-                fileData:
+        try {
+            const chatSession = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+            const result = await chatSession.generateContent([
                 {
-                    mimeType: mimeType,
-                    fileUri: fileUri
-                }
-            }, prompt]);
-        return result.response.text()
+                    fileData: {
+                        mimeType: mimeType,
+                        fileUri: fileUri
+                    }
+                }, 
+                prompt
+            ])
+    
+            return result.response.text()
+        } catch (error) {
+            console.error('Error extracting measure from image:', error)
+            throw new Error('Failed to extract measure from image')
+        }
     }
-
+    
     public async getFile(fileUri: string): Promise<string> {
         const fileResponse = await this.fileManager.getFile(fileUri)
         return fileResponse.uri

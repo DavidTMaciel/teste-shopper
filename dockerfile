@@ -3,6 +3,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build
-EXPOSE 3030
-CMD ["npm", "dev"]
+RUN npx tsc
+EXPOSE 3000
+CMD ["npm", "start"]

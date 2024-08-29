@@ -1,6 +1,7 @@
 import { UploadFileResponse, MeasureEntity } from "../../../domain/entity/measure"
-import { UploadImageForMeasureUseCaseRepositoryInterface } from "../../../domain/usecase/repository/measure"
-import { createMeasure } from "../../internal/database/postgresql/measure"
+import { ConfirmMeasureUseCaseRepositoryInterface, UploadImageForMeasureUseCaseRepositoryInterface } from "../../../domain/usecase/repository/measure"
+import { storageLocal } from "../../internal/cloud/cloud"
+import { createMeasure, getMeasureByID, updateMeasureValue } from "../../internal/database/postgresql/measure"
 import { geminiService } from "../../internal/gemini/gemini"
 
 class UploadImageForMeasureUseCaseRepository implements UploadImageForMeasureUseCaseRepositoryInterface {
@@ -8,17 +9,28 @@ class UploadImageForMeasureUseCaseRepository implements UploadImageForMeasureUse
         return await geminiService.uploadImage(image, imageID, mimeType)
     }
     async extractMesureFromImage(mimeType: string, fileUri: string, fileUrl: string): Promise<string> {
-        return await geminiService.extractMesureFromImage(mimeType,fileUri,fileUrl)
+        return await geminiService.extractMesureFromImage(mimeType, fileUri, fileUrl)
     }
     async createMesure(measure: MeasureEntity): Promise<MeasureEntity> {
         return await createMeasure(measure)
     }
-    async createTemporaryLinkForImage(imageID: string): string {
-        
+    async createTemporaryLinkForImage(fileUri: string): Promise<string> {
+        return await storageLocal.generateTemporaryLink(fileUri)
     }
 
 }
 
-export{
-    UploadImageForMeasureUseCaseRepository
+class ConfirmMeasureUseCaseRepository implements ConfirmMeasureUseCaseRepositoryInterface {
+    async getMeasureByID(id: string): Promise<MeasureEntity | null> {
+        return await getMeasureByID(id)
+    }
+    async updateMeasureValue(measure: MeasureEntity): Promise<void> {
+        return await updateMeasureValue(measure)
+    }
+
+}
+
+export {
+    UploadImageForMeasureUseCaseRepository,
+    ConfirmMeasureUseCaseRepository
 }

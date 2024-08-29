@@ -12,11 +12,11 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL:postgres://user:password@db:5432/shopper 
-      - DB_USER_NAME:user
-      - DB_PASSWORD:password
-      - DB_NAME:shopper
-      - GEMINI_API_KEY:AIzaSyD8JFsKZL4lVbrzKs6iR9NiEecvuWMhVK0
+      DATABASE_URL: postgres://user:password@db:5432/shopper 
+      DB_USER_NAME: user
+      DB_PASSWORD: password
+      DB_NAME: shopper
+      GEMINI_API_KEY: AIzaSyCLWohV-bQN-AJXkGph71e6lhBtAGGHhxw
   db:
     image: postgres:13
     volumes:

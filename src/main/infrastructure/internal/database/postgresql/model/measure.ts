@@ -5,8 +5,8 @@ class MeasureModel {
     @PrimaryColumn({ type: 'varchar'})
     public measure_uuid: string
 
-    @Column({ type: 'timestamp', nullable: true, update: false})
-    public measure_datetime: Date
+    @Column({ type: 'timestamp'})
+    public measure_datetime: string
 
     @Column({ type: 'varchar'})
     public measure_type: string
@@ -20,13 +20,17 @@ class MeasureModel {
     @Column({ type: 'integer' })
     public measure_value: number
 
-    constructor(measure_uuid: string, measure_datetime: Date, measure_type: string, has_confirmed: boolean, image_url: string, measure_value: number) {
+    @Column({ type: 'varchar'})
+    public customer_code: string
+
+    constructor(measure_uuid: string, measure_datetime: string, measure_type: string, has_confirmed: boolean, image_url: string, measure_value: number,customer_code: string) {
         this.measure_uuid = measure_uuid
         this.measure_datetime = measure_datetime
         this.measure_type = measure_type
         this.has_confirmed = has_confirmed
         this.image_url = image_url
         this.measure_value = measure_value
+        this.customer_code=customer_code
     }
 }
 

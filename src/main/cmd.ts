@@ -1,6 +1,6 @@
 import { Main } from './main'
 
-const port = 3050
+const port = 3000
 
 async function CMD() {
   try {
