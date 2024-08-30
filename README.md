@@ -21,7 +21,7 @@ Este projeto é um serviço backend desenvolvido em Node.js e TypeScript para ge
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/teste-shopper.git
+   git clone https://github.com/DavidTMaciel/teste-shopper.git
 2. Instale as dependências:
     ```bash
     npm install
