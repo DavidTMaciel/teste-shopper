@@ -11,7 +11,7 @@ class MeasureModel {
     @Column({ type: 'varchar'})
     public measure_type: string
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'boolean' })
     public has_confirmed: boolean
 
     @Column({ type: 'varchar' })

@@ -31,8 +31,8 @@ class ConfirmMeasureUseCaseRepository implements ConfirmMeasureUseCaseRepository
 }
 
 class GetMeasureByCustomerCodeUseCaseRepository implements GetMeasureByCustomerCodeUseCaseRepositoryInterface{
-    async getMeasureByCustomerCode(id: string, type?: string): Promise<GetMeasureEntity[] | null> {
-        return await getMeasureByCustomerCode(id, type)
+    async getMeasureByCustomerCode(code: string, type?: string): Promise<GetMeasureEntity[] | null> {
+        return await getMeasureByCustomerCode(code, type)
     }
 }
 

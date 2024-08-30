@@ -9,10 +9,10 @@ async function createMeasure(measure: MeasureEntity): Promise<MeasureEntity> {
     return toCreateMeasureEntity(repository)
 }
 
-async function getMeasureByMonth(code: string, type: string, date: string): Promise<MeasureEntity | null> {
+async function getMeasureByMonth(code: string, type: string): Promise<MeasureEntity[] | null> {
     const repository = AppDataSource.getRepository(MeasureModel)
-    const measure = await repository.findOne({ where: { customer_code: code, measure_type: type, measure_datetime:date } })
-    return measure ?  toCreateMeasureEntity(measure) : null
+    const measure = await repository.find({ where: { customer_code: code, measure_type: type } })
+    return measure ?  measure.map((e) => toCreateMeasureEntity(e))  : null
 }
 
 async function getMeasureByID(ID: string): Promise<MeasureModel | null> {
@@ -28,9 +28,9 @@ async function updateMeasureValue(measure: MeasureEntity): Promise<void>{
 }
 
 
-async function getMeasureByCustomerCode(id:string, type?: string): Promise<GetMeasureEntity[] | null> {
+async function getMeasureByCustomerCode(code:string, type?: string): Promise<GetMeasureEntity[] | null> {
     const repository = AppDataSource.getRepository(MeasureModel)
-    const model = await repository.find({where:{measure_uuid: id, measure_type: type}})
+    const model = await repository.find({where:{customer_code: code, measure_type: type}})
     const result = model.map((e) => toGetMeasureEntity(e))
     return result
 }

@@ -4,8 +4,6 @@ services:
     build: .
     image: node:22.2.0
     working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app
     ports:
       - "3000:3000"
     command: npm start
@@ -16,7 +14,7 @@ services:
       DB_USER_NAME: user
       DB_PASSWORD: password
       DB_NAME: shopper
-      GEMINI_API_KEY: AIzaSyCLWohV-bQN-AJXkGph71e6lhBtAGGHhxw
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
   db:
     image: postgres:13
     volumes:

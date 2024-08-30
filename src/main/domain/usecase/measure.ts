@@ -23,30 +23,29 @@ class UploadImageForMeasureUseCase {
         try {
             const messageError = await this.validate.uploadImageForMeasure(req)
 
-            if (messageError) {
-                console.log(messageError);
-                return messageError;  // Retorna imediatamente se houver erro
-            }
+            if (!messageError) {
                 let image = this.convertBase64ToFile(req.image)
                 const imageID = this.common.generateUUID()
                 const mimeType = this.extractMimeType(req.image)
-      
-                const upload = await this.repository.uploadImageForMeasure(image[1], imageID, mimeType!)
 
+                const upload = await this.repository.uploadImageForMeasure(image[1], imageID, mimeType!)
                 const value = await this.repository.extractMesureFromImage(upload.mimeType, upload.fileUri, PROMPT)
                 let measureValue = Number(value)
                 const temporaryUrl = await this.repository.createTemporaryLinkForImage(image[0])
 
                 const measureID = this.common.generateUUID()
 
-                const measure = new MeasureEntity(measureID, req.measure_datetime, req.measure_type.toUpperCase(), true, temporaryUrl, measureValue, req.customer_code)
-                console.log('use case', measure)
+                const measure = new MeasureEntity(measureID, req.measure_datetime, req.measure_type.toUpperCase(), false, temporaryUrl, measureValue, req.customer_code)
+
                 await this.repository.createMesure(measure)
                 return new UploadImageForMeasureUseCaseResponse(temporaryUrl, measureValue, measureID,)
-            
+            }
+            else {
+                return messageError;
+            }
         } catch (error: any) {
             console.log(TAG_INTERNAL_SERVER_ERROR, error)
-            return new UploadImageForMeasureUseCaseResponse(null, null, null)
+            return new ErrorEntity(TAG_INTERNAL_SERVER_ERROR, error)
         }
     }
 
@@ -86,10 +85,11 @@ class ConfirmMeasureUseCase {
                 const measure = await this.repository.getMeasureByID(req.measure_uuid)
 
                 if (measure) {
-                    if (measure.measure_value == req.confirmed_value) {
+                    if (measure.has_confirmed == true) {
                         return new ErrorEntity(ERROR_CODE_409, "Leitura do mês já realizada")
                     } else {
                         measure.measure_value = req.confirmed_value
+                        measure.has_confirmed = true
                         await this.repository.updateMeasureValue(measure)
                         return new ConfirmMeasureUseCaseResponse(true)
                     }
@@ -100,7 +100,7 @@ class ConfirmMeasureUseCase {
             return messageError
         } catch (error: any) {
             console.log(TAG_INTERNAL_SERVER_ERROR, error)
-            return new ConfirmMeasureUseCaseResponse(null)
+            return new ErrorEntity(TAG_INTERNAL_SERVER_ERROR, error)
         }
     }
 }
@@ -119,20 +119,25 @@ class GetMeasureByCustomerCodeUseCase {
 
             const messageError = await this.validate.getMeasureByCustomerCode(req)
 
-            if(!messageError){
+            if (!messageError) {
                 let measure = null
-                if(req.measure_type){
-                     measure = await this.repository.getMeasureByCustomerCode(req.customer_code,req.measure_type)
-                }else{
+                if (req.measure_type) {
+                    measure = await this.repository.getMeasureByCustomerCode(req.customer_code, req.measure_type.toUpperCase())
+                } else {
                     measure = await this.repository.getMeasureByCustomerCode(req.customer_code)
                 }
-                
-                return measure ? new GetMeasureByCustomerCodeUseCaseResponse(req.customer_code, measure) : new ErrorEntity(ERROR_CODE_404_NOT_FOUND, "Nenhuma leitura encontrada")
+
+                if (measure?.length == 0) {
+                    return new ErrorEntity(ERROR_CODE_404_NOT_FOUND, "Nenhuma leitura encontrada")
+                } else {
+                    return new GetMeasureByCustomerCodeUseCaseResponse(req.customer_code, measure)
+                }
+            } else {
+                return messageError
             }
-            return messageError
         } catch (error: any) {
             console.log(TAG_INTERNAL_SERVER_ERROR, error)
-            return new GetMeasureByCustomerCodeUseCaseResponse(null, null)
+            return new ErrorEntity(TAG_INTERNAL_SERVER_ERROR, error)
         }
 
     }

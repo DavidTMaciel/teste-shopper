@@ -13,7 +13,7 @@ interface ConfirmMeasureUseCaseRepositoryInterface {
 }
 
 interface GetMeasureByCustomerCodeUseCaseRepositoryInterface {
-    getMeasureByCustomerCode(id: string, type?: string): Promise<GetMeasureEntity[] | null>
+    getMeasureByCustomerCode(code: string, type?: string): Promise<GetMeasureEntity[] | null>
 }
 
 export {

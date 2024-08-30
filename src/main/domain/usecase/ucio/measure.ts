@@ -46,9 +46,9 @@ class ConfirmMeasureUseCaseResponse {
 
 class GetMeasureByCustomerCodeUseCaseRequest {
     public customer_code: string
-    public measure_type: string | null
+    public measure_type: any | null
 
-    constructor(customer_code: string, measure_type: string | null) {
+    constructor(customer_code: string, measure_type: any | null) {
         this.customer_code = customer_code
         this.measure_type = measure_type
     }

@@ -1,17 +1,13 @@
 import express from 'express'
 import { AppDataSource } from './infrastructure/internal/database/postgresql/datasorce'
 import { Router } from './delivery/routes'
-
 require('dotenv').config()
-const { GoogleGenerativeAI } = require("@google/generative-ai")
-
 class Main {
   private app: express.Application
 
   constructor() {
     this.app = express()
-    this.router()
-   // this.setupGenerativeAI()  
+    this.router() 
   }
 
   private router() {
