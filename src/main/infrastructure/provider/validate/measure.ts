@@ -1,8 +1,8 @@
 import { ErrorEntity } from "../../../domain/entity/error"
 import { ERROR_CODE_400, ERROR_CODE_409_REPORT } from "../../../domain/usecase/constant/measure"
-import { ConfirmMeasureUseCaseRequest, UploadImageForMeasureUseCaseRequest } from "../../../domain/usecase/ucio/measure"
-import { ConfirmMeasureUseCaseValidateInterface, UploadImageForMeasureUseCaseValidateInterface } from "../../../domain/usecase/validate/measure"
-import { getMeasureByMonth } from "../../internal/database/postgresql/measure"
+import { ConfirmMeasureUseCaseRequest, GetMeasureByCustomerCodeUseCaseRequest, UploadImageForMeasureUseCaseRequest } from "../../../domain/usecase/ucio/measure"
+import { ConfirmMeasureUseCaseValidateInterface, GetMeasureByCustomerCodeUseCaseValidateInterface, UploadImageForMeasureUseCaseValidateInterface } from "../../../domain/usecase/validate/measure"
+import { getMeasureByID, getMeasureByMonth } from "../../internal/database/postgresql/measure"
 import { checkIfWaterOrGas, checkNumberEmpty, checkStringEmpty, isBase64String, isValidDateFormat } from "./validate"
 
 class UploadImageForMeasureUseCaseValidate implements UploadImageForMeasureUseCaseValidateInterface {
@@ -15,11 +15,24 @@ class UploadImageForMeasureUseCaseValidate implements UploadImageForMeasureUseCa
 
         if (isValidDateFormat(req.measure_datetime)) return new ErrorEntity(ERROR_CODE_400, "A data da medição deve ser informada \n ex:28/08/2024")
 
-        if (await this.checkMeasureMonthByType(req.measure_datetime, req.measure_type, req.customer_code)) return new ErrorEntity(ERROR_CODE_409_REPORT, "Leitura do mês já realizada")
+        if (req.measure_type && !checkIfWaterOrGas(req.measure_type)) {
+           if (await this.compareMonthYearAndType(req.measure_datetime, req.measure_type, req.customer_code)) return new ErrorEntity(ERROR_CODE_409_REPORT, "Leitura do mês já realizada")
+         }
         return null
     }
 
-    private async checkMeasureMonthByType(date: string, type: string, code: string): Promise<boolean> {
+    private async compareMonthYearAndType(inputDate: string, inputType: string, code: string): Promise<boolean> {
+        const mesure = await getMeasureByMonth(code, inputType, inputDate)
+        if (!mesure || !mesure.measure_datetime) {
+            return false
+        }
+        const [inputDay, inputMonth, inputYear] = inputDate.split("/")
+        const [measureDay, measureMonth, measureYear] = mesure.measure_datetime.split("/")
+        return  inputMonth === measureMonth && inputYear === measureYear && inputType === mesure.measure_type      
+    }
+
+
+    /*private async checkMeasureMonthByType(date: string, type: string, code: string): Promise<boolean> {
         console
         const inputDate = this.parseDate(date)
         if (!inputDate) return false
@@ -37,18 +50,18 @@ class UploadImageForMeasureUseCaseValidate implements UploadImageForMeasureUseCa
             const measureYear = measureDate.getFullYear()
             return measureMonth === inputMonth && measureYear === inputYear && measure.measure_type === type
         })
-    }
+    }*/
 
-    private parseDate(dateString: string): Date | null {
-        const dateTimeRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
-        const value = String(dateString)
-        const match = value.match(dateTimeRegex)//resolver problema do math
-        if (!match) return null
-        const day = parseInt(match[1], 10)
-        const month = parseInt(match[2], 10) - 1
-        const year = parseInt(match[3], 10)
-        return new Date(year, month, day)
-    }
+    /* private parseDate(dateString: string): Date | null {
+         const dateTimeRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
+         const value = String(dateString)
+         const match = value.match(dateTimeRegex)//resolver problema do math
+         if (!match) return null
+         const day = parseInt(match[1], 10)
+         const month = parseInt(match[2], 10) - 1
+         const year = parseInt(match[3], 10)
+         return new Date(year, month, day)
+     }*/
 }
 
 class ConfirmMeasureUseCaseValidate implements ConfirmMeasureUseCaseValidateInterface {
@@ -62,7 +75,17 @@ class ConfirmMeasureUseCaseValidate implements ConfirmMeasureUseCaseValidateInte
 
 }
 
+class GetMeasureByCustomerCodeUseCaseValidate implements GetMeasureByCustomerCodeUseCaseValidateInterface {
+    async getMeasureByCustomerCode(req: GetMeasureByCustomerCodeUseCaseRequest): Promise<ErrorEntity | null> {
+        if (req.measure_type ? checkIfWaterOrGas(req.measure_type) : false) return new ErrorEntity(ERROR_CODE_400, "O tipo da medição, obrigatoriamente deve ser WATER ou GAS")
+
+        return null
+    }
+
+}
+
 export {
     UploadImageForMeasureUseCaseValidate,
-    ConfirmMeasureUseCaseValidate
+    ConfirmMeasureUseCaseValidate,
+    GetMeasureByCustomerCodeUseCaseValidate
 }

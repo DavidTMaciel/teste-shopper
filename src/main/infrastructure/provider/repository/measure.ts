@@ -1,7 +1,7 @@
-import { UploadFileResponse, MeasureEntity } from "../../../domain/entity/measure"
-import { ConfirmMeasureUseCaseRepositoryInterface, UploadImageForMeasureUseCaseRepositoryInterface } from "../../../domain/usecase/repository/measure"
+import { UploadFileResponse, MeasureEntity, GetMeasureEntity } from "../../../domain/entity/measure"
+import { ConfirmMeasureUseCaseRepositoryInterface, GetMeasureByCustomerCodeUseCaseRepositoryInterface, UploadImageForMeasureUseCaseRepositoryInterface } from "../../../domain/usecase/repository/measure"
 import { storageLocal } from "../../internal/cloud/cloud"
-import { createMeasure, getMeasureByID, updateMeasureValue } from "../../internal/database/postgresql/measure"
+import { createMeasure, getMeasureByCustomerCode, getMeasureByID, updateMeasureValue } from "../../internal/database/postgresql/measure"
 import { geminiService } from "../../internal/gemini/gemini"
 
 class UploadImageForMeasureUseCaseRepository implements UploadImageForMeasureUseCaseRepositoryInterface {
@@ -30,7 +30,14 @@ class ConfirmMeasureUseCaseRepository implements ConfirmMeasureUseCaseRepository
 
 }
 
+class GetMeasureByCustomerCodeUseCaseRepository implements GetMeasureByCustomerCodeUseCaseRepositoryInterface{
+    async getMeasureByCustomerCode(id: string, type?: string): Promise<GetMeasureEntity[] | null> {
+        return await getMeasureByCustomerCode(id, type)
+    }
+}
+
 export {
     UploadImageForMeasureUseCaseRepository,
-    ConfirmMeasureUseCaseRepository
+    ConfirmMeasureUseCaseRepository,
+    GetMeasureByCustomerCodeUseCaseRepository
 }

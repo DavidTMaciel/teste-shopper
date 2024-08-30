@@ -1,3 +1,5 @@
+import { GetMeasureEntity, MeasureEntity } from "../../entity/measure"
+
 class UploadImageForMeasureUseCaseRequest {
     public image: string
     public customer_code: string
@@ -42,9 +44,31 @@ class ConfirmMeasureUseCaseResponse {
     }
 }
 
+class GetMeasureByCustomerCodeUseCaseRequest {
+    public customer_code: string
+    public measure_type: string | null
+
+    constructor(customer_code: string, measure_type: string | null) {
+        this.customer_code = customer_code
+        this.measure_type = measure_type
+    }
+}
+
+class GetMeasureByCustomerCodeUseCaseResponse {
+    public customer_code: string | null
+    public measures: GetMeasureEntity[] | null
+
+    constructor(customer_code: string | null, measures: GetMeasureEntity[]| null) {
+        this.customer_code = customer_code
+        this.measures = measures
+    }
+}
+
 export {
     UploadImageForMeasureUseCaseRequest,
     UploadImageForMeasureUseCaseResponse,
     ConfirmMeasureUseCaseRequest,
-    ConfirmMeasureUseCaseResponse
+    ConfirmMeasureUseCaseResponse,
+    GetMeasureByCustomerCodeUseCaseRequest,
+    GetMeasureByCustomerCodeUseCaseResponse
 }

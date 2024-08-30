@@ -1,7 +1,7 @@
-import { MeasureEntity } from "../../../../domain/entity/measure"
+import { GetMeasureEntity, MeasureEntity } from "../../../../domain/entity/measure"
 import { AppDataSource } from "./datasorce"
 import { MeasureModel } from "./model/measure"
-import { toCreateMeasureEntity, toCreateMeasureModel } from "./transformer/measure"
+import { toCreateMeasureEntity, toCreateMeasureModel, toGetMeasureEntity } from "./transformer/measure"
 
 async function createMeasure(measure: MeasureEntity): Promise<MeasureEntity> {
     const measureModel = toCreateMeasureModel(measure)
@@ -9,10 +9,10 @@ async function createMeasure(measure: MeasureEntity): Promise<MeasureEntity> {
     return toCreateMeasureEntity(repository)
 }
 
-async function getMeasureByMonth(code: string): Promise<MeasureEntity[] | null> {
+async function getMeasureByMonth(code: string, type: string, date: string): Promise<MeasureEntity | null> {
     const repository = AppDataSource.getRepository(MeasureModel)
-    const measure = await repository.find({ where: { customer_code: code } })
-    return measure ? measure.map((e) => toCreateMeasureEntity(e)) : null
+    const measure = await repository.findOne({ where: { customer_code: code, measure_type: type, measure_datetime:date } })
+    return measure ?  toCreateMeasureEntity(measure) : null
 }
 
 async function getMeasureByID(ID: string): Promise<MeasureModel | null> {
@@ -27,9 +27,18 @@ async function updateMeasureValue(measure: MeasureEntity): Promise<void>{
     await repository.save(model)
 }
 
+
+async function getMeasureByCustomerCode(id:string, type?: string): Promise<GetMeasureEntity[] | null> {
+    const repository = AppDataSource.getRepository(MeasureModel)
+    const model = await repository.find({where:{measure_uuid: id, measure_type: type}})
+    const result = model.map((e) => toGetMeasureEntity(e))
+    return result
+}
+
 export {
     createMeasure,
     getMeasureByMonth,
     getMeasureByID,
-    updateMeasureValue
+    updateMeasureValue,
+    getMeasureByCustomerCode
 }

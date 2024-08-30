@@ -5,7 +5,7 @@ class MeasureModel {
     @PrimaryColumn({ type: 'varchar'})
     public measure_uuid: string
 
-    @Column({ type: 'timestamp'})
+    @Column({ type: 'varchar'})
     public measure_datetime: string
 
     @Column({ type: 'varchar'})

@@ -1,10 +1,10 @@
 import { ErrorEntity, TAG_INTERNAL_SERVER_ERROR } from "../entity/error"
 import { MeasureEntity } from "../entity/measure"
 import { UploadImageForMeasureUseCaseCommonInterface } from "./common/measure"
-import { ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_409, PROMPT } from "./constant/measure"
-import { ConfirmMeasureUseCaseRepositoryInterface, UploadImageForMeasureUseCaseRepositoryInterface } from "./repository/measure"
-import { ConfirmMeasureUseCaseRequest, ConfirmMeasureUseCaseResponse, UploadImageForMeasureUseCaseRequest, UploadImageForMeasureUseCaseResponse } from "./ucio/measure"
-import { ConfirmMeasureUseCaseValidateInterface, UploadImageForMeasureUseCaseValidateInterface } from "./validate/measure"
+import { ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_404_NOT_FOUND, ERROR_CODE_409, PROMPT } from "./constant/measure"
+import { ConfirmMeasureUseCaseRepositoryInterface, GetMeasureByCustomerCodeUseCaseRepositoryInterface, UploadImageForMeasureUseCaseRepositoryInterface } from "./repository/measure"
+import { ConfirmMeasureUseCaseRequest, ConfirmMeasureUseCaseResponse, GetMeasureByCustomerCodeUseCaseResponse, GetMeasureByCustomerCodeUseCaseRequest, UploadImageForMeasureUseCaseRequest, UploadImageForMeasureUseCaseResponse } from "./ucio/measure"
+import { ConfirmMeasureUseCaseValidateInterface, GetMeasureByCustomerCodeUseCaseValidateInterface, UploadImageForMeasureUseCaseValidateInterface } from "./validate/measure"
 import * as fs from 'fs'
 import path from 'path'
 
@@ -23,27 +23,27 @@ class UploadImageForMeasureUseCase {
         try {
             const messageError = await this.validate.uploadImageForMeasure(req)
 
-            if (!messageError) {
+            if (messageError) {
+                console.log(messageError);
+                return messageError;  // Retorna imediatamente se houver erro
+            }
                 let image = this.convertBase64ToFile(req.image)
                 const imageID = this.common.generateUUID()
                 const mimeType = this.extractMimeType(req.image)
-                console.log(mimeType)
+      
                 const upload = await this.repository.uploadImageForMeasure(image[1], imageID, mimeType!)
-                console.log('upload', upload)
 
                 const value = await this.repository.extractMesureFromImage(upload.mimeType, upload.fileUri, PROMPT)
-                console.log(value, 'value')
                 let measureValue = Number(value)
                 const temporaryUrl = await this.repository.createTemporaryLinkForImage(image[0])
-                
+
                 const measureID = this.common.generateUUID()
-                console.log(measureID)
-                const measure = new MeasureEntity(measureID, req.measure_datetime, req.measure_type, true, temporaryUrl, measureValue, req.customer_code)
+
+                const measure = new MeasureEntity(measureID, req.measure_datetime, req.measure_type.toUpperCase(), true, temporaryUrl, measureValue, req.customer_code)
+                console.log('use case', measure)
                 await this.repository.createMesure(measure)
                 return new UploadImageForMeasureUseCaseResponse(temporaryUrl, measureValue, measureID,)
-            } else {
-                return messageError
-            }
+            
         } catch (error: any) {
             console.log(TAG_INTERNAL_SERVER_ERROR, error)
             return new UploadImageForMeasureUseCaseResponse(null, null, null)
@@ -105,7 +105,41 @@ class ConfirmMeasureUseCase {
     }
 }
 
+class GetMeasureByCustomerCodeUseCase {
+    public validate: GetMeasureByCustomerCodeUseCaseValidateInterface
+    public repository: GetMeasureByCustomerCodeUseCaseRepositoryInterface
+
+    constructor(validate: GetMeasureByCustomerCodeUseCaseValidateInterface, repository: GetMeasureByCustomerCodeUseCaseRepositoryInterface) {
+        this.validate = validate
+        this.repository = repository
+    }
+
+    async getMeasureByCustomerCode(req: GetMeasureByCustomerCodeUseCaseRequest): Promise<GetMeasureByCustomerCodeUseCaseResponse | ErrorEntity> {
+        try {
+
+            const messageError = await this.validate.getMeasureByCustomerCode(req)
+
+            if(!messageError){
+                let measure = null
+                if(req.measure_type){
+                     measure = await this.repository.getMeasureByCustomerCode(req.customer_code,req.measure_type)
+                }else{
+                    measure = await this.repository.getMeasureByCustomerCode(req.customer_code)
+                }
+                
+                return measure ? new GetMeasureByCustomerCodeUseCaseResponse(req.customer_code, measure) : new ErrorEntity(ERROR_CODE_404_NOT_FOUND, "Nenhuma leitura encontrada")
+            }
+            return messageError
+        } catch (error: any) {
+            console.log(TAG_INTERNAL_SERVER_ERROR, error)
+            return new GetMeasureByCustomerCodeUseCaseResponse(null, null)
+        }
+
+    }
+}
+
 export {
     UploadImageForMeasureUseCase,
-    ConfirmMeasureUseCase
+    ConfirmMeasureUseCase,
+    GetMeasureByCustomerCodeUseCase
 }

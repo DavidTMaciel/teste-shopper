@@ -6,7 +6,10 @@ function checkStringEmpty(e: string): boolean {
 function checkIfWaterOrGas(e: string): boolean {
     if(!e) return true
     const validTypes = ["WATER", "GAS"]
-    return validTypes.includes(e.toUpperCase().trim()) ? false : true
+
+    let t = validTypes.includes(e.toUpperCase().trim()) ? false : true
+    console.log(t,'chek')
+    return t
 }
 
 function isBase64String(str: string): boolean {
