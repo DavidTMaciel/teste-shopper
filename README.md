@@ -22,12 +22,9 @@ Este projeto é um serviço backend desenvolvido em Node.js e TypeScript para ge
 
    ```bash
    git clone https://github.com/DavidTMaciel/teste-shopper.git
-2. Instale as dependências:
-    ```bash
-    npm install
-3. Configure as variáveis de ambiente no arquivo .env.
+2. Configure as variáveis de ambiente no arquivo .env.
 
-4. Execute o projeto usando Docker:
+3. Execute o projeto usando Docker:
    ```bash
     docker-compose up --build
 
