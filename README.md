@@ -1,4 +1,4 @@
-# Teste Shopper
+# Api com IA
 
 Este projeto é um serviço backend desenvolvido em Node.js e TypeScript para gerenciar leituras individuais de consumo de água e gás. O serviço recebe imagens de medidores, consulta um modelo de IA para extrair as leituras e permite a confirmação ou correção dessas leituras.
 
